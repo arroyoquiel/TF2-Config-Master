@@ -1,0 +1,17 @@
+{
+  "name": "tf2-config-master",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/style.css --minify",
+    "build:js": "mkdir -p dist/js && cp node_modules/jszip/dist/jszip.min.js dist/js/"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

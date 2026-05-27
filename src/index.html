@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TF2 Config Master</title>
+  <link href="style.css" rel="stylesheet">
+  <link href="assets/fonts/material-icons.css" rel="stylesheet">
+  <script src="js/jszip.min.js"></script>
+</head>
+<body class="bg-tf2-dark text-gray-200 min-h-screen flex flex-col">
+  <div id="app" class="flex-1 flex flex-col max-w-4xl mx-auto w-full p-4">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold text-tf2-accent">TF2 Config Master</h1>
+      <p class="text-gray-400 mt-1">Merge custom TF2 configuration files in your browser</p>
+    </header>
+
+    <main class="flex-1 flex flex-col gap-6">
+      <div 
+        id="drop-zone" 
+        class="border-2 border-dashed border-gray-600 rounded-lg p-12 text-center cursor-pointer hover:border-tf2-accent transition-colors bg-tf2-darker flex-1 flex items-center justify-center min-h-[200px]"
+      >
+        <div id="drop-content">
+          <i class="material-icons mx-auto text-5xl text-gray-500">upload_file</i>
+          <p class="mt-4 text-lg text-gray-300">Drag & Drop Folders/Files Here</p>
+          <p class="text-sm text-gray-500 mt-1">Drop TF2 cfg folders, .cfg files, .vpk archives, or .zip files</p>
+        </div>
+        <div id="processing-indicator" class="hidden">
+          <i class="material-icons animate-spin mx-auto text-5xl text-tf2-accent">refresh</i>
+          <p class="mt-4 text-lg text-tf2-accent">Processing...</p>
+        </div>
+      </div>
+
+      <div id="conflicts-panel" class="bg-tf2-darker rounded-lg p-4 hidden">
+        <h2 class="text-xl font-semibold mb-3 text-tf2-accent">Conflicts to Resolve</h2>
+        <div id="conflicts-list" class="space-y-4 max-h-64 overflow-y-auto custom-scrollbar"></div>
+      </div>
+
+      <div class="bg-tf2-darker rounded-lg p-4">
+        <h2 class="text-xl font-semibold mb-3 text-tf2-accent">Processed Files</h2>
+        <div id="files-list" class="text-gray-400 text-center py-8">No files uploaded yet</div>
+      </div>
+
+      <div class="flex gap-4">
+        <button 
+          id="download-btn" 
+          disabled
+          class="flex-1 bg-tf2-accent hover:bg-tf2-accent-hover disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <i class="material-icons">download</i>
+          Download Merged ZIP
+        </button>
+        <button 
+          id="reset-btn"
+          class="flex-1 bg-transparent border border-gray-600 hover:border-red-500 hover:text-red-400 text-gray-400 font-bold py-3 px-6 rounded-lg transition-colors hidden"
+        >
+          Reset / Clear
+        </button>
+      </div>
+    </main>
+
+    <footer class="mt-8 py-4 border-t border-gray-800 text-center text-xs text-gray-500 flex justify-between items-center">
+      <span>© 2025 arrchr • MIT License</span>
+      <button id="open-legal-btn" class="hover:text-tf2-accent transition-colors underline">Third-Party Licenses</button>
+    </footer>
+  </div>
+
+<div id="legal-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="bg-tf2-darker rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between p-4 border-b border-gray-700">
+        <h3 class="text-lg font-semibold text-tf2-accent">Third-Party Licenses</h3>
+        <button id="close-legal" class="text-gray-400 hover:text-white transition-colors">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto custom-scrollbar flex-1 text-xs text-gray-300 space-y-6">
+        
+        <div>
+          <h4 class="font-semibold text-tf2-accent text-sm mb-2">JSZip (v3.10.1)</h4>
+          <pre class="bg-tf2-dark p-3 rounded font-mono text-[10px] overflow-x-auto whitespace-pre-wrap text-gray-400">
+MIT License
+
+Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-tf2-accent text-sm mb-2">Tailwind CSS (v3.4.1)</h4>
+          <pre class="bg-tf2-dark p-3 rounded font-mono text-[10px] overflow-x-auto whitespace-pre-wrap text-gray-400">
+MIT License
+
+Copyright (c) Tailwind Labs, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-tf2-accent text-sm mb-2">Material Design Icons (v145)</h4>
+          <p class="text-gray-400 mb-2 font-mono text-[11px]">Copyright (c) Google LLC</p>
+          <pre class="bg-tf2-dark p-3 rounded font-mono text-[10px] h-48 overflow-y-auto whitespace-pre-wrap text-gray-400">
+Apache License, Version 2.0
+
+Copyright (c) Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------------
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+--------------------------------------------------------------------------------
+          </pre>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  
+  <div id="preview-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="bg-tf2-darker rounded-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between p-4 border-b border-gray-700">
+        <h3 id="preview-title" class="text-lg font-semibold text-tf2-accent truncate"></h3>
+        <button id="close-preview" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+          <i class="material-icons text-sm">close</i>
+          Close
+        </button>
+      </div>
+      <div id="preview-content" class="p-4 overflow-y-auto custom-scrollbar flex-1 font-mono text-xs text-gray-300 whitespace-pre-wrap break-all bg-tf2-dark"></div>
+      <div id="preview-metadata" class="hidden p-4 text-xs text-gray-400 space-y-1 border-t border-gray-700"></div>
+    </div>
+  </div>
+
+  <script>
+    const vfs = new Map();
+    const conflicts = new Map();
+
+    function findCommonPrefixToStrip(paths) {
+      if (paths.length === 0) return "";
+      const tf2Dirs = new Set(['cfg', 'materials', 'resource', 'sound', 'scripts', 'media', 'maps', 'models', 'particles', 'custom']);
+      
+      let sampleParts = paths[0].split('/');
+      let commonParts = [];
+      
+      for (let i = 0; i < sampleParts.length; i++) {
+        const part = sampleParts[i];
+        
+        if (tf2Dirs.has(part.toLowerCase())) {
+          break;
+        }
+        
+        const isCommon = paths.every(path => {
+          const parts = path.split('/');
+          return parts[i] === part;
+        });
+        
+        if (isCommon) {
+          commonParts.push(part);
+        } else {
+          break;
+        }
+      }
+      
+      return commonParts.length > 0 ? commonParts.join('/') + '/' : '';
+    }
+
+    function isUnsupportedArchive(filename) {
+      return /\.(rar|7z|tar|tar\.gz|tgz|gz)$/i.test(filename);
+    }
+
+    const dropZone = document.getElementById('drop-zone');
+    const filesList = document.getElementById('files-list');
+    const downloadBtn = document.getElementById('download-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    const previewModal = document.getElementById('preview-modal');
+    const previewTitle = document.getElementById('preview-title');
+    const previewContent = document.getElementById('preview-content');
+    const previewMetadata = document.getElementById('preview-metadata');
+    const closePreviewBtn = document.getElementById('close-preview');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-tf2-accent');
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-tf2-accent');
+    });
+
+    async function processDropItems(items) {
+      const dropContent = document.getElementById('drop-content');
+      const processingIndicator = document.getElementById('processing-indicator');
+      dropContent.classList.add('hidden');
+      processingIndicator.classList.remove('hidden');
+      
+      const batchFiles = [];
+      const promises = [];
+      
+      for (let i = 0; i < items.length; i++) {
+        const entry = items[i].webkitGetAsEntry();
+        if (entry) {
+          const file = items[i].getAsFile();
+          const origin = entry.isDirectory ? entry.name : (file && file.webkitRelativePath ? file.webkitRelativePath.split('/')[0] : entry.name);
+          promises.push(collectEntryFiles(entry, origin, batchFiles));
+        }
+      }
+      await Promise.all(promises);
+      
+      const relativePaths = batchFiles.map(f => f.relativePath);
+      const prefixToStrip = findCommonPrefixToStrip(relativePaths);
+      
+      for (const { relativePath, uint8Array, origin } of batchFiles) {
+        const finalPath = relativePath.startsWith(prefixToStrip) ? relativePath.substring(prefixToStrip.length) : relativePath;
+        addFileToVFS(finalPath, uint8Array, origin);
+      }
+      
+      dropContent.classList.remove('hidden');
+      processingIndicator.classList.add('hidden');
+    }
+
+    async function collectEntryFiles(entry, origin, batchFiles) {
+      return new Promise((resolve) => {
+        if (entry.isFile) {
+          entry.file(async (file) => {
+            try {
+              if (isUnsupportedArchive(file.name)) {
+                alert(file.name + ' is using an unsupported compressed format (.rar/.7z/.tar.gz). Please extract it first and drag the folder in, or re-compress it as a standard .zip file.');
+              } else if (file.name.endsWith('.zip')) {
+                await processZIP(file);
+              } else if (file.name.endsWith('.vpk')) {
+                await processVPK(file);
+              } else {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                let relativePath = file.name;
+                if (file.webkitRelativePath) {
+                  const parts = file.webkitRelativePath.split('/');
+                  const originIndex = parts.findIndex(p => p === origin);
+                  if (originIndex >= 0) {
+                    relativePath = parts.slice(originIndex + 1).join('/');
+                  }
+                }
+                batchFiles.push({ relativePath, uint8Array, origin });
+              }
+            } catch (err) {
+              console.error('Error processing file:', err);
+            }
+            resolve();
+          });
+        } else if (entry.isDirectory) {
+          const reader = entry.createReader();
+          const readEntries = () => {
+            return new Promise((res) => {
+              reader.readEntries((entries) => {
+                if (entries.length === 0) {
+                  res();
+                } else {
+                  Promise.all(entries.map(child => collectEntryFiles(child, origin, batchFiles))).then(() => readEntries().then(res));
+                }
+              });
+            });
+          };
+          readEntries().then(resolve);
+        } else {
+          resolve();
+        }
+      });
+    }
+
+    dropZone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.webkitdirectory = true;
+      input.style.display = 'none';
+      input.onchange = async (e) => {
+        const files = Array.from(e.target.files);
+        await processFileInputs(files);
+        renderFilesList();
+      };
+      document.body.appendChild(input);
+      input.click();
+      document.body.removeChild(input);
+    });
+
+    async function processFileInputs(files) {
+      const batchFiles = [];
+      const promises = [];
+      
+      for (const file of files) {
+        if (isUnsupportedArchive(file.name)) {
+          alert(file.name + ' is using an unsupported compressed format (.rar/.7z/.tar.gz). Please extract it first and drag the folder in, or re-compress it as a standard .zip file.');
+        } else if (file.name.endsWith('.zip')) {
+          promises.push(processZIP(file));
+        } else if (file.name.endsWith('.vpk')) {
+          promises.push(processVPK(file));
+        } else {
+          const origin = file.webkitRelativePath ? file.webkitRelativePath.split('/')[0] : '';
+          batchFiles.push({ file, origin });
+        }
+      }
+      await Promise.all(promises);
+      
+      const relativePaths = batchFiles.map(f => {
+        let path = f.file.name;
+        if (f.file.webkitRelativePath) {
+          const parts = f.file.webkitRelativePath.split('/');
+          const originIndex = parts.findIndex(p => p === f.origin);
+          if (originIndex >= 0) {
+            path = parts.slice(originIndex + 1).join('/');
+          }
+        }
+        return path;
+      });
+      const prefixToStrip = findCommonPrefixToStrip(relativePaths);
+      
+      for (const { file, origin } of batchFiles) {
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        let relativePath = file.name;
+        if (file.webkitRelativePath) {
+          const parts = file.webkitRelativePath.split('/');
+          const originIndex = parts.findIndex(p => p === origin);
+          if (originIndex >= 0) {
+            relativePath = parts.slice(originIndex + 1).join('/');
+          }
+        }
+        const finalPath = relativePath.startsWith(prefixToStrip) ? relativePath.substring(prefixToStrip.length) : relativePath;
+        addFileToVFS(finalPath, uint8Array, origin);
+      }
+    }
+
+    dropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-tf2-accent');
+      const items = e.dataTransfer.items;
+      await processDropItems(items);
+      renderFilesList();
+    });
+
+    function addFileToVFS(path, uint8Array, origin) {
+      const type = getMimeType(path);
+
+      if (vfs.has(path)) {
+        const existing = vfs.get(path);
+        if (path.endsWith('.cfg')) {
+          mergeCfgFiles(existing, uint8Array, path, origin);
+        } else {
+          if (!conflicts.has(path)) {
+            vfs.delete(path);
+            conflicts.set(path, {
+              path,
+              options: [
+                { origin: existing.origin, data: existing.data },
+                { origin, data: uint8Array }
+              ],
+              selectedIdx: 0
+            });
+            vfs.set(path, { data: existing.data, type: getMimeType(path), origin: existing.origin });
+          } else {
+            conflicts.get(path).options.push({ origin, data: uint8Array });
+          }
+        }
+      } else {
+        vfs.set(path, { data: uint8Array, type, origin });
+      }
+    }
+
+    async function processVPK(file) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const view = new DataView(arrayBuffer);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const decoder = new TextDecoder('utf-8');
+        let offset = 0;
+
+        const signature = view.getUint32(offset, true);
+        if (signature !== 0x55AA1234) {
+          throw new Error('Invalid VPK signature');
+        }
+        offset += 4;
+
+        const version = view.getUint32(offset, true);
+        offset += 4;
+
+        const directorySize = view.getUint32(offset, true);
+        offset += 4;
+
+        if (version === 2) {
+          offset += 16;
+        }
+
+        const directoryEndOffset = offset + directorySize;
+        const dataSectionOffset = directoryEndOffset;
+
+        function readNullString() {
+          const start = offset;
+          while (offset < directoryEndOffset && uint8Array[offset] !== 0) {
+            offset++;
+          }
+          const stringBytes = uint8Array.subarray(start, offset);
+          offset++;
+          return decoder.decode(stringBytes);
+        }
+
+        while (offset < directoryEndOffset) {
+          let ext = readNullString();
+          if (ext === "" && offset >= directoryEndOffset) break; 
+
+          while (offset < directoryEndOffset) {
+            let path = readNullString();
+            if (path === "") break;
+
+            let normalizedPath = path.replace(/\\/g, '/').replace(/[^\x20-\x7E]/g, '').trim();
+            normalizedPath = normalizedPath.replace(/^\/+|\/+$/g, '');
+
+            while (offset < directoryEndOffset) {
+              let filename = readNullString();
+              if (filename === "") break;
+
+              filename = filename.replace(/[^\x20-\x7E]/g, '');
+
+              const crc32 = view.getUint32(offset, true);
+              const preloadBytes = view.getUint16(offset + 4, true);
+              const archiveIndex = view.getUint16(offset + 6, true);
+              const entryOffset = view.getUint32(offset + 8, true);
+              const entryLength = view.getUint32(offset + 12, true);
+              offset += 18;
+
+              let preloadData = new Uint8Array(0);
+              if (preloadBytes > 0) {
+                preloadData = uint8Array.subarray(offset, offset + preloadBytes);
+                offset += preloadBytes;
+              }
+
+              let fileData = preloadData;
+              if (entryLength > 0 && archiveIndex === 0x7FFF) {
+                const payloadData = uint8Array.subarray(
+                  dataSectionOffset + entryOffset, 
+                  dataSectionOffset + entryOffset + entryLength
+                );
+                
+                if (preloadBytes > 0) {
+                  fileData = new Uint8Array(preloadBytes + entryLength);
+                  fileData.set(preloadData, 0);
+                  fileData.set(payloadData, preloadBytes);
+                } else {
+                  fileData = payloadData;
+                }
+              }
+
+              const fullPath = normalizedPath ? `${normalizedPath}/${filename}.${ext}` : `${filename}.${ext}`;
+              addFileToVFS(fullPath, fileData, file.name);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error processing VPK:', err);
+      }
+    }
+
+    async function processZIP(file) {
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const filePaths = Object.keys(zip.files).filter(p => !zip.files[p].dir);
+        const prefixToStrip = findCommonPrefixToStrip(filePaths);
+        
+        const promises = [];
+        for (const relativePath in zip.files) {
+          const zipEntry = zip.files[relativePath];
+          if (zipEntry.dir) continue;
+          promises.push((async () => {
+            const data = await zipEntry.async('uint8array');
+            const finalPath = relativePath.startsWith(prefixToStrip) ? relativePath.substring(prefixToStrip.length) : relativePath;
+            addFileToVFS(finalPath, data, file.name);
+          })());
+        }
+        await Promise.all(promises);
+      } catch (err) {
+        console.error('Error processing ZIP:', err);
+      }
+    }
+
+    function resetState() {
+      vfs.clear();
+      conflicts.clear();
+      renderFilesList();
+      resetBtn.classList.add('hidden');
+    }
+
+    function isTextFile(filename) {
+      const textExtensions = ['cfg', 'txt', 'res', 'json', 'menu', 'vmt'];
+      const ext = filename.split('.').pop().toLowerCase();
+      return textExtensions.includes(ext);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showFilePreview(path, entry) {
+      previewTitle.textContent = path;
+      previewContent.innerHTML = '';
+      previewMetadata.classList.add('hidden');
+      
+      if (isTextFile(path)) {
+        const decoder = new TextDecoder();
+        try {
+          const text = decoder.decode(entry.data);
+          const lines = text.split('\n');
+          previewContent.innerHTML = lines.map((line, i) => 
+            '<div class="flex"><span class="text-gray-600 select-none w-12 text-right pr-3 mr-3 border-r border-gray-700">' + (i + 1) + '</span><span class="flex-1">' + escapeHtml(line) + '</span></div>'
+          ).join('');
+        } catch (err) {
+          previewContent.textContent = '[Unable to decode file content]';
+        }
+      } else {
+        previewContent.innerHTML = '<span class="text-gray-500">[Binary file - content not previewable]</span>';
+        previewMetadata.classList.remove('hidden');
+        const sizeKB = (entry.data.length / 1024).toFixed(2);
+        const ext = path.split('.').pop().toLowerCase();
+        previewMetadata.innerHTML = '<p><span class="text-gray-500">Path:</span> <span class="text-gray-300 font-mono">' + path + '</span></p>' +
+          '<p><span class="text-gray-500">Size:</span> <span class="text-gray-300">' + sizeKB + ' KB</span></p>' +
+          '<p><span class="text-gray-500">Format:</span> <span class="text-gray-300">.' + ext + '</span></p>';
+      }
+      previewModal.classList.remove('hidden');
+      previewModal.classList.add('flex');
+    }
+
+    closePreviewBtn.addEventListener('click', () => {
+      previewModal.classList.add('hidden');
+      previewModal.classList.remove('flex');
+    });
+
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) {
+        previewModal.classList.add('hidden');
+        previewModal.classList.remove('flex');
+      }
+    });
+
+    const openLegalBtn = document.getElementById('open-legal-btn');
+    const legalModal = document.getElementById('legal-modal');
+    const closeLegalBtn = document.getElementById('close-legal');
+
+    openLegalBtn.addEventListener('click', () => {
+      legalModal.classList.remove('hidden');
+      legalModal.classList.add('flex');
+    });
+
+    closeLegalBtn.addEventListener('click', () => {
+      legalModal.classList.add('hidden');
+      legalModal.classList.remove('flex');
+    });
+
+    legalModal.addEventListener('click', (e) => {
+      if (e.target === legalModal) {
+        legalModal.classList.add('hidden');
+        legalModal.classList.remove('flex');
+      }
+    });
+
+    resetBtn.addEventListener('click', resetState);
+
+    function getMimeType(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const mimeTypes = {
+        cfg: 'text/plain',
+        txt: 'text/plain',
+        log: 'text/plain',
+        json: 'application/json',
+        xml: 'application/xml',
+      };
+      return mimeTypes[ext] || 'application/octet-stream';
+    }
+
+    function mergeCfgFiles(existing, newData, path, newOrigin) {
+      const decoder = new TextDecoder();
+      const existingText = decoder.decode(existing.data);
+      const newText = decoder.decode(newData);
+      
+      const mergedText = '// === Merged from: ' + existing.origin + ' ===\n' + existingText + '\n\n// === Merged from: ' + newOrigin + ' ===\n' + newText + '\n';
+      
+      const encoder = new TextEncoder();
+      const mergedData = encoder.encode(mergedText);
+      
+      vfs.set(path, { data: mergedData, type: 'text/plain', origin: existing.origin + ', ' + newOrigin });
+    }
+
+    function renderFilesList() {
+      const conflictsPanel = document.getElementById('conflicts-panel');
+      const conflictsList = document.getElementById('conflicts-list');
+      
+      if (conflicts.size > 0) {
+        conflictsPanel.classList.remove('hidden');
+        conflictsList.innerHTML = Array.from(conflicts.entries()).map(([path, conflict]) => 
+          '<div class="bg-tf2-dark rounded-lg p-3">' +
+            '<div class="flex items-center justify-between mb-2">' +
+              '<span class="font-mono text-xs text-tf2-accent">' + path + '</span>' +
+              '<span class="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Conflict</span>' +
+            '</div>' +
+            '<div class="flex flex-wrap gap-2">' +
+              conflict.options.map((opt, idx) => 
+                '<button data-path="' + path + '" data-idx="' + idx + '" class="conflict-option px-3 py-1 text-xs rounded-full transition-colors ' + (idx === conflict.selectedIdx ? 'bg-tf2-accent text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600') + '">' + opt.origin + '</button>'
+              ).join('') +
+            '</div>' +
+          '</div>'
+        ).join('');
+      } else {
+        conflictsPanel.classList.add('hidden');
+      }
+
+      if (vfs.size === 0) {
+        filesList.innerHTML = '<div class="text-gray-400 text-center py-8">No files uploaded yet</div>';
+        downloadBtn.disabled = true;
+        resetBtn.classList.add('hidden');
+        return;
+      }
+
+      downloadBtn.disabled = false;
+      resetBtn.classList.remove('hidden');
+      
+      const conflictPaths = new Set(conflicts.keys());
+      const sortedEntries = Array.from(vfs.entries()).sort(([a], [b]) => a.localeCompare(b));
+      
+      let tableRows = '';
+      for (const [path, entry] of sortedEntries) {
+        const conflictBadge = conflictPaths.has(path) ? '<span class="text-xs ml-2 px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full whitespace-nowrap">Conflict Resolved</span>' : '';
+        tableRows += '<tr class="border-b border-gray-800 last:border-0 hover:bg-tf2-dark cursor-pointer transition-colors" data-path="' + path + '">' +
+          '<td class="py-2 font-mono text-xs break-all">' + path + ' ' + conflictBadge + '</td>' +
+          '<td class="py-2 text-gray-400 break-all">' + entry.origin + '</td>' +
+        '</tr>';
+      }
+      
+      filesList.innerHTML = '<div class="max-h-64 overflow-y-auto custom-scrollbar">' +
+          '<table class="w-full text-sm">' +
+            '<thead class="border-b border-gray-700">' +
+              '<tr class="text-left">' +
+                '<th class="pb-2 font-medium">Path</th>' +
+                '<th class="pb-2 font-medium">Origin</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' + tableRows + '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<p class="text-xs text-gray-500 mt-2">' + vfs.size + ' file(s) processed</p>';
+      
+      document.querySelectorAll('.conflict-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const path = btn.dataset.path;
+          const idx = parseInt(btn.dataset.idx);
+          const conflict = conflicts.get(path);
+          if (conflict && conflict.selectedIdx !== idx) {
+            conflict.selectedIdx = idx;
+            const selectedOption = conflict.options[idx];
+            vfs.set(path, { data: selectedOption.data, type: getMimeType(path), origin: selectedOption.origin });
+            renderFilesList();
+          }
+        });
+      });
+
+      document.querySelectorAll('#files-list tbody tr').forEach(row => {
+        row.addEventListener('click', () => {
+          const path = row.dataset.path;
+          const entry = vfs.get(path);
+          if (entry) showFilePreview(path, entry);
+        });
+      });
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      const zip = new JSZip();
+      
+      for (const [path, entry] of vfs.entries()) {
+        zip.file(path, entry.data);
+      }
+
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged_custom.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
